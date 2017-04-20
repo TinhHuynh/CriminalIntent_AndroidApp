@@ -13,6 +13,7 @@ import com.example.tinhhuynh.criminalintent.R;
  */
 
 public abstract class SingleFragmentActivity extends FragmentActivity {
+
     protected abstract Fragment createFragment();
 
     @Override
@@ -28,6 +29,9 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
             fragmentManager.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();
+
         }
     }
+
+
 }
