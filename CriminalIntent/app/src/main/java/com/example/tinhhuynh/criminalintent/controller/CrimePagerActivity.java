@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 
 import com.example.tinhhuynh.criminalintent.R;
 import com.example.tinhhuynh.criminalintent.model.Crime;
@@ -20,7 +20,7 @@ import java.util.UUID;
 /**
  * Created by TINH HUYNH on 4/21/2017.
  */
-public class CrimePagerActivity extends FragmentActivity {
+public class CrimePagerActivity extends AppCompatActivity {
 
     private static final String EXTRA_CRIME_ID = "com.example.tinhhuynh.criminalintent.model.CrimeLab.crime_id";
     private ViewPager mViewPager;
