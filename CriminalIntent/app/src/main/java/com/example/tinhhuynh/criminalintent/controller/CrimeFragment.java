@@ -1,6 +1,7 @@
 package com.example.tinhhuynh.criminalintent.controller;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -54,6 +55,7 @@ public class CrimeFragment extends Fragment {
     private ImageView mPhotoView;
     private ImageButton mPhotoButton;
     private File mPhotoFile;
+    private Callbacks mCallbacks;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -62,6 +64,16 @@ public class CrimeFragment extends Fragment {
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity;
+        if (context instanceof Activity) {
+            activity = (Activity) context;
+            mCallbacks = (Callbacks) activity;
+        }
     }
 
     @Override
@@ -77,10 +89,9 @@ public class CrimeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
         mTitleField = (EditText) v.findViewById(R.id.crime_title);
-//        mTitleField.setText(mCrime.getTitle().toString());
-        if (mCrime.getTitle() != null) {
-            mTitleField.setText(mCrime.getTitle().toString());
-        }
+//      mTitleField.setText(mCrime.getTitle().toString());
+        mTitleField.setText(mCrime.getTitle());
+
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -90,6 +101,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -116,6 +128,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mCrime.setSolved(isChecked);
+                updateCrime();
             }
         });
 
@@ -183,6 +196,7 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
+            updateCrime();
         } else if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData();
             String[] queryFields = new String[]{
@@ -198,13 +212,20 @@ public class CrimeFragment extends Fragment {
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
+                updateCrime();
             } finally {
                 c.close();
             }
 
         } else if (requestCode == REQUEST_PHOTO) {
             updatePhotoView();
+            updateCrime();
         }
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
     }
 
     private void updateDate() {
@@ -216,6 +237,12 @@ public class CrimeFragment extends Fragment {
     public void onPause() {
         super.onPause();
         CrimeLab.get(getActivity()).updateCrime(mCrime);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
     }
 
     private String getCrimeReport() {
@@ -246,6 +273,10 @@ public class CrimeFragment extends Fragment {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
     }
 
 

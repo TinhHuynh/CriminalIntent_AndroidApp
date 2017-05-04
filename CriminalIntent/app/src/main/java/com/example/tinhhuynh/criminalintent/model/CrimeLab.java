@@ -92,6 +92,7 @@ public class CrimeLab {
 
         mDatabase.update(CrimeTable.NAME, values,
                 CrimeTable.Cols.UUID + " = ?", new String[]{uuid});
+
     }
 
     private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
